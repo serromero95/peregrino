@@ -1,1 +1,23 @@
+#game-container {
+    width: 1280px;
+    height: 720px;
+    border: 2px solid black;
+    position: relative;
+    overflow: hidden;
+}
 
+.player {
+    width: 143px;
+    height: 170px;
+
+    position: absolute;
+    left: 80px;
+    bottom: 40px;
+
+    background-image: url("../assets/img/characters/pilgrim.png");
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center bottom;
+
+    z-index: 10;
+}
