@@ -4,6 +4,8 @@
     border: 2px solid black;
     position: relative;
     overflow: hidden;
+    background-image: url("../assets/img/backgrounds/background.png");
+    background-position:bottom;
 }
 
 .player {
@@ -12,7 +14,7 @@
 
     position: absolute;
     left: 80px;
-    bottom: 40px;
+    bottom: 80px;
 
     background-image: url("../assets/img/characters/pilgrim.png");
     background-size: contain;
@@ -20,4 +22,14 @@
     background-position: center bottom;
 
     z-index: 10;
+}
+
+.ground {
+    position: absolute;
+    bottom:0;
+
+    width: 100%;
+    height: 80px;
+
+    background-color:red;
 }
