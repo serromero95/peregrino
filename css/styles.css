@@ -14,7 +14,7 @@
 
     position: absolute;
     left: 80px;
-    bottom: 80px;
+    bottom: 60px;
 
     background-image: url("../assets/img/characters/pilgrim.png");
     background-size: contain;
@@ -31,5 +31,5 @@
     width: 100%;
     height: 80px;
 
-    background-color:red;
+    background-color: brown;
 }
