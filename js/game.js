@@ -31,4 +31,7 @@ let playerY = 60;
 setInterval(function() {
     playerY = playerY - 5;
     player.style.bottom = playerY + "px";
+    if(playerY < 60) {
+        playerY = 60;
+    }
 }, 16);
