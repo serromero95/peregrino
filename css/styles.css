@@ -33,3 +33,21 @@
 
     background-color: brown;
 }
+
+.platform {
+    background-color: brown;
+    height: 30px;
+    position: absolute;
+}
+
+.platform1 {
+    left: 300px;
+    bottom: 170px;
+    width: 220px;
+}
+
+.platform2 {
+    left: 600px;
+    bottom: 260px;
+    width: 200px;
+}
