@@ -100,15 +100,15 @@ setInterval(function() {
         playerX = playerX - playerSpeed;
     }
 
-    const playerRight = playerX + playerWidth;
-
     if(playerX < 0) {
         playerX = 0;
     }
 
-    if(playerRight > 1280) {
+    if(playerX + playerWidth > 1280) {
         playerX = 1280 - playerWidth;
     }
+
+    const playerRight = playerX + playerWidth;
 
     const previousPlayerY = playerY;
     playerY = playerY + velocityY;
