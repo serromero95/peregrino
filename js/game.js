@@ -36,7 +36,7 @@ let movingRight = false;
 let movingLeft = false;
 let playerSpeed = 5;
 
-const playerWidth = 123;
+const playerWidth = 80;
 const playerHeight = 150;
 
 
@@ -102,6 +102,14 @@ setInterval(function() {
 
     const playerRight = playerX + playerWidth;
 
+    if(playerX < 0) {
+        playerX = 0;
+    }
+
+    if(playerRight > 1280) {
+        playerX = 1280 - playerWidth;
+    }
+
     const previousPlayerY = playerY;
     playerY = playerY + velocityY;
     velocityY = velocityY - gravity;
@@ -128,7 +136,7 @@ setInterval(function() {
 
     }
 
-        if (playerRight >= platform3Left && playerX <= platform3Right && playerY <= platform3Top && previousPlayerY >= platform3Top && velocityY < 0) {
+    if (playerRight >= platform3Left && playerX <= platform3Right && playerY <= platform3Top && previousPlayerY >= platform3Top && velocityY < 0) {
 
         playerY = platform3Top;
         velocityY = 0;
