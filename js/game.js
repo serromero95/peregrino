@@ -1,16 +1,12 @@
 const gameContainer = document.getElementById("game-container");
 
-const player = document.createElement("div");
-
-player.className = "player";
-
-gameContainer.appendChild(player);
+const world = document.createElement("div");
+world.className = "world";
+gameContainer.appendChild(world);
 
 const ground = document.createElement("div");
-
 ground.className = "ground";
-
-gameContainer.appendChild(ground);
+world.appendChild(ground);
 
 const platform1 = document.createElement("div");
 const platform2 = document.createElement("div");
@@ -20,9 +16,13 @@ platform1.className = "platform platform1";
 platform2.className = "platform platform2";
 platform3.className = "platform platform3";
 
-gameContainer.appendChild(platform1);
-gameContainer.appendChild(platform2);
-gameContainer.appendChild(platform3);
+world.appendChild(platform1);
+world.appendChild(platform2);
+world.appendChild(platform3);
+
+const player = document.createElement("div");
+player.className = "player";
+gameContainer.appendChild(player);
 
 let playerX = 80;
 let playerY = 80;
