@@ -37,6 +37,8 @@ let gravity = 1;
 let isJumping = false;
 let jumpForce = 18;
 
+let isOnSurface = true;
+
 let movingRight = false;
 let movingLeft = false;
 let playerSpeed = 5;
@@ -78,7 +80,8 @@ document.addEventListener("keydown", function(event) {
         movingLeft = true;
     }
 
-    if(event.code === "Space" && !isJumping) {
+    if(event.code === "Space" && isOnSurface) {
+        isOnSurface = false;
         isJumping = true;
         velocityY = jumpForce;
     }
@@ -129,10 +132,13 @@ setInterval(function() {
     playerY = playerY + velocityY;
     velocityY = velocityY - gravity;
 
-    if(playerY < 80) {
+    isOnSurface = false;
+
+    if(playerY <= 80) {
         playerY = 80;
         velocityY = 0;
         isJumping = false;
+        isOnSurface = true;
     }
 
     if(playerRight >= platform1Left && playerX <= platform1Right && playerY <= platform1Top && previousPlayerY >= platform1Top && velocityY < 0) {
@@ -140,6 +146,7 @@ setInterval(function() {
         playerY = platform1Top;
         velocityY = 0; 
         isJumping = false;
+        isOnSurface = true;
 
     }
 
@@ -148,6 +155,7 @@ setInterval(function() {
         playerY = platform2Top;
         velocityY = 0;
         isJumping = false;
+        isOnSurface = true;
 
     }
 
@@ -156,6 +164,7 @@ setInterval(function() {
         playerY = platform3Top;
         velocityY = 0;
         isJumping = false;
+        isOnSurface = true;
 
     }
 
