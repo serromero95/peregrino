@@ -27,6 +27,11 @@ gameContainer.appendChild(player);
 let playerX = 80;
 let playerY = 80;
 
+let cameraX = 0;
+
+const screenWidth = gameContainer.clientWidth;
+const worldWidth = 3000;
+
 let velocityY = 0;
 let gravity = 1;
 let isJumping = false;
@@ -104,9 +109,19 @@ setInterval(function() {
         playerX = 0;
     }
 
-    if(playerX + playerWidth > 1280) {
-        playerX = 1280 - playerWidth;
+    if(playerX + playerWidth > worldWidth) {
+        playerX = worldWidth - playerWidth;
     }
+
+    cameraX = playerX - screenWidth / 2;
+
+    if (cameraX < 0) {
+        cameraX = 0;
+    }
+
+    if (cameraX > worldWidth - screenWidth) {
+        cameraX = worldWidth - screenWidth;
+    } 
 
     const playerRight = playerX + playerWidth;
 
@@ -144,7 +159,11 @@ setInterval(function() {
 
     }
 
-    player.style.left = playerX + "px";
+    const playerScreenX = playerX - cameraX;
+
+    player.style.left = playerScreenX + "px";
     player.style.bottom = playerY + "px";
+
+    world.style.left = -cameraX + "px";
 
 }, 16);
