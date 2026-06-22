@@ -4,13 +4,11 @@
     border: 2px solid black;
     position: relative;
     overflow: hidden;
-    background-image: url("../assets/img/backgrounds/background.png");
-    background-position:bottom;
 }
 
 .player {
-    width: 143px;
-    height: 170px;
+    width: 80px;
+    height: 150px;
 
     position: absolute;
     left: 80px;
@@ -34,6 +32,17 @@
     background-color: brown;
 }
 
+.world {
+    background-image: url("../assets/img/backgrounds/background.png");
+    background-position: bottom left;
+    background-repeat: repeat-x;
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 3000px;
+    height: 720px;
+}
+
 .platform {
     background-color: brown;
     height: 30px;
@@ -50,4 +59,10 @@
     left: 600px;
     bottom: 260px;
     width: 200px;
+}
+
+.platform3 {
+    left: 900px;
+    bottom: 350px;
+    width: 180px;
 }
