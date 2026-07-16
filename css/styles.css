@@ -1,9 +1,23 @@
+* {
+    box-sizing: border-box;
+}
+
 #game-container {
     width: 1280px;
     height: 720px;
     border: 2px solid black;
     position: relative;
     overflow: hidden;
+
+    background-image: url("../assets/img/backgrounds/background.png");
+    background-repeat: no-repeat;
+    background-position: left bottom;
+}
+
+.world {
+    position:absolute;
+    width: 3000px;
+    height: 100%;
 }
 
 .player {
@@ -12,7 +26,7 @@
 
     position: absolute;
     left: 80px;
-    bottom: 60px;
+    bottom: 80px;
 
     background-image: url("../assets/img/characters/pilgrim.png");
     background-size: contain;
@@ -20,6 +34,8 @@
     background-position: center bottom;
 
     z-index: 10;
+
+    border: 1px solid yellow;
 }
 
 .ground {
@@ -33,32 +49,38 @@
 }
 
 .world {
-    background-image: url("../assets/img/backgrounds/background.png");
-    background-position: bottom left;
-    background-repeat: repeat-x;
     position: absolute;
     left: 0;
     bottom: 0;
     width: 3000px;
-    height: 720px;
+    height: 100%;
 }
 
 .platform {
     background-color: brown;
-    height: 30px;
     position: absolute;
 }
 
 .platform1 {
-    left: 300px;
-    bottom: 170px;
-    width: 220px;
+    border: 1px solid yellow;
 }
 
 .platform2 {
-    left: 600px;
-    bottom: 260px;
-    width: 200px;
+
+}
+
+.platform3 {
+
+}
+
+.respawning {
+    animation: blink 0.4s infinite;
+}
+
+@keyframes blink {
+    50% {
+        opacity: 0;
+    }
 }
 
 .platform3 {
