@@ -90,13 +90,21 @@ let playerX = groundHeight;
 let playerY = groundHeight;
 
 // Lives
+
+const livesContainer = document.createElement("div");
+livesContainer.classList.add("lives-container");
+gameContainer.append(livesContainer);
+
 let checkPointX = 80;
 let checkPointY = groundHeight;
 
 let isRespawning = false;
 
 let hasFallen = false;
+let totalLives = 3;
 let lives = 3;
+
+renderLives();
 
 // Player stats
 
@@ -119,6 +127,30 @@ const gameKeys = ["ArrowLeft", "ArrowRight", "Space"];
 let cameraX = 0;
 
 const screenWidth = gameContainer.clientWidth;
+
+//Functions
+
+function renderLives() {
+
+    livesContainer.innerHTML = "";
+
+    const lostLives = totalLives - lives;
+    
+    for(let i = 0; i<lives; i++){
+        const heart = document.createElement("img");
+        heart.src = "assets/img/ui/heart.png";
+        heart.classList.add("heart");
+        livesContainer.append(heart);
+    }
+
+    for(let i=0; i<lostLives; i++) {
+        const emptyHeart = document.createElement("img");
+        emptyHeart.src = "assets/img/ui/empty-heart.png";
+        emptyHeart.classList.add("empty-heart");
+        livesContainer.append(emptyHeart);
+    }
+
+}
 
 //Player moves
 
@@ -254,6 +286,7 @@ setInterval(function() {
         movingRight = false;
 
         lives--;
+        renderLives();
         console.log(lives)
         
         isRespawning = true;

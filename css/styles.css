@@ -88,3 +88,19 @@
     bottom: 350px;
     width: 180px;
 }
+
+.lives-container {
+    position:absolute;
+    left: 20px;
+    top: 30px;
+
+    display: flex;
+    gap: 8px;
+
+    z-index: 100;
+}
+
+.heart, .empty-heart {
+    width: 62px;
+    height: 62px;
+}
