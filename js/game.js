@@ -1,42 +1,108 @@
+// World object
+
 const gameContainer = document.getElementById("game-container");
 
 const world = document.createElement("div");
 world.className = "world";
 gameContainer.appendChild(world);
 
-const ground = document.createElement("div");
-ground.className = "ground";
-world.appendChild(ground);
+const worldWidth = world.clientWidth;
 
-const platform1 = document.createElement("div");
-const platform2 = document.createElement("div");
-const platform3 = document.createElement("div");
+//Grounds
 
-platform1.className = "platform platform1";
-platform2.className = "platform platform2";
-platform3.className = "platform platform3";
+const grounds = [
+    { left: 0, width: 520 },
+    { left: 760, width: 360 },
+    { left: 1380, width: 300 },
+    { left: 1980, width: 320 },
+    { left: 2600, width: 400 }
+];
 
-world.appendChild(platform1);
-world.appendChild(platform2);
-world.appendChild(platform3);
+const groundHeight = 80;
+
+grounds.forEach(ground => {
+    const floor = document. createElement("div");
+
+    ground.right = ground.left + ground.width;
+
+    floor.classList.add("ground");
+
+    floor.style.left = ground.left + "px";
+    floor.style.width = ground.width + "px";
+    floor.style.height = groundHeight + "px";
+
+    world.append(floor);
+});
+
+//Platforms
+
+const platforms = [
+    { className: "platform1", left: 280, bottom: 180, width: 150, height: 30 },
+
+    // Primer hueco: dos saltos
+    { className: "platform2", left: 555, bottom: 150, width: 90, height: 30 },
+    { className: "platform3", left: 675, bottom: 220, width: 70, height: 30 },
+
+    { className: "platform4", left: 900, bottom: 240, width: 120, height: 30 },
+
+    // Segundo hueco: plataformas pequeñas y escalonadas
+    { className: "platform5", left: 1155, bottom: 150, width: 75, height: 30 },
+    { className: "platform6", left: 1260, bottom: 230, width: 70, height: 30 },
+
+    { className: "platform7", left: 1450, bottom: 320, width: 110, height: 30 },
+
+    // Tercer hueco: salto descendente
+    { className: "platform8", left: 1715, bottom: 260, width: 70, height: 30 },
+    { className: "platform9", left: 1820, bottom: 180, width: 75, height: 30 },
+
+    { className: "platform10", left: 2070, bottom: 260, width: 110, height: 30 },
+
+    // Último hueco: tramo más difícil
+    { className: "platform11", left: 2335, bottom: 150, width: 65, height: 30 },
+    { className: "platform12", left: 2435, bottom: 230, width: 60, height: 30 },
+    { className: "platform13", left: 2530, bottom: 310, width: 55, height: 30 },
+
+    { className: "platform14", left: 2750, bottom: 220, width: 130, height: 30 }
+];
+
+platforms.forEach(platform => {
+    const block = document.createElement("div");
+    platform.right = platform.left + platform.width;
+    platform.top = platform.bottom + platform.height;
+    
+    block.classList.add("platform", platform.className);
+
+    block.style.left = platform.left + "px";
+    block.style.bottom = platform.bottom + "px";
+    block.style.width = platform.width + "px";
+    block.style.height = platform.height + "px";
+
+    world.append(block);
+});
+
+//Player
 
 const player = document.createElement("div");
 player.className = "player";
 gameContainer.appendChild(player);
 
-let playerX = 80;
-let playerY = 80;
+let playerX = groundHeight;
+let playerY = groundHeight;
 
-let cameraX = 0;
+// Lives
+let checkPointX = 80;
+let checkPointY = groundHeight;
 
-const screenWidth = gameContainer.clientWidth;
-const worldWidth = 3000;
+let isRespawning = false;
+
+let hasFallen = false;
+let lives = 3;
+
+// Player stats
 
 let velocityY = 0;
 let gravity = 1;
-let isJumping = false;
 let jumpForce = 18;
-
 let isOnSurface = true;
 
 let movingRight = false;
@@ -46,66 +112,64 @@ let playerSpeed = 5;
 const playerWidth = 80;
 const playerHeight = 150;
 
+const gameKeys = ["ArrowLeft", "ArrowRight", "Space"];
 
-const platform1Left = 300;
-const platform1Width = 220;
+//Sreen & Camera
 
-const platform1Right = platform1Left + platform1Width;
-const platform1Bottom = 170;
-const platform1Height = 30;
-const platform1Top = platform1Bottom + platform1Height;
+let cameraX = 0;
 
-const platform2Left = 600;
-const platform2Width = 200;
+const screenWidth = gameContainer.clientWidth;
 
-const platform2Right = platform2Left + platform2Width;
-const platform2Bottom = 260;
-const platform2Height = 30;
-const platform2Top = platform2Bottom + platform2Height;
+//Player moves
 
-const platform3Left = 900;
-const platform3Width = 180;
-
-const platform3Right = platform3Left + platform3Width;
-const platform3Bottom = 350;
-const platform3Height = 30;
-const platform3Top = platform3Bottom + platform3Height;
+let facingRight = true;
 
 document.addEventListener("keydown", function(event) {
-    if(event.key === "ArrowRight"){
+    if(gameKeys.includes(event.code)) {
+        event.preventDefault();
+    }
+    
+    if(isRespawning) {
+        return;
+    }
+
+    if(event.code === "ArrowRight"){
         movingRight = true;
     }
 
-    if(event.key === "ArrowLeft"){
+    if(event.code === "ArrowLeft"){
         movingLeft = true;
     }
 
     if(event.code === "Space" && isOnSurface) {
-        isOnSurface = false;
-        isJumping = true;
         velocityY = jumpForce;
+        isOnSurface = false;
     }
 
 });
 
 document.addEventListener("keyup", function(event) {
-    if(event.key === "ArrowRight"){
+
+    if(event.code === "ArrowRight"){
         movingRight = false;
     }
 
-    if(event.key === "ArrowLeft"){
+    if(event.code === "ArrowLeft"){
         movingLeft = false;
     }
 });
 
 setInterval(function() {
+    isOnSurface = false;
 
     if(movingRight){
         playerX = playerX + playerSpeed;
+        facingRight = true;
     }
 
     if(movingLeft){
         playerX = playerX - playerSpeed;
+        facingRight = false;
     }
 
     if(playerX < 0) {
@@ -116,15 +180,19 @@ setInterval(function() {
         playerX = worldWidth - playerWidth;
     }
 
-    cameraX = playerX - screenWidth / 2;
+    if(playerX + playerWidth / 2 > screenWidth/2) {
+        cameraX = playerX + playerWidth/2 - (screenWidth/2);
+    } else {
+        cameraX = 0;
+    }
+
+    if(cameraX > worldWidth - screenWidth) {
+        cameraX = worldWidth - screenWidth;
+    }
 
     if (cameraX < 0) {
         cameraX = 0;
     }
-
-    if (cameraX > worldWidth - screenWidth) {
-        cameraX = worldWidth - screenWidth;
-    } 
 
     const playerRight = playerX + playerWidth;
 
@@ -132,46 +200,88 @@ setInterval(function() {
     playerY = playerY + velocityY;
     velocityY = velocityY - gravity;
 
-    isOnSurface = false;
+    //Grounds collision
 
-    if(playerY <= 80) {
-        playerY = 80;
+    grounds.forEach(ground => {
+
+        if ( 
+            playerY <= groundHeight &&
+            playerRight >= ground.left &&
+            playerX <= ground.right &&
+            previousPlayerY >= groundHeight &&
+            velocityY < 0
+        ) {
+            playerY = groundHeight;
+            velocityY = 0;
+            isOnSurface = true;
+        }
+
+    })
+
+    //Platform collision
+
+    platforms.forEach(platform => {
+
+        if( 
+            playerRight >= platform.left &&
+            playerX <= platform.right &&
+            playerY <= platform.top && 
+            previousPlayerY >= platform.top &&
+            velocityY < 0
+        ) {
+            playerY = platform.top;
+            velocityY = 0; 
+            isOnSurface = true;
+        }
+
+    });
+
+    if (isOnSurface) {
+        if(facingRight) {
+            checkPointX = Math.max(0, playerX - playerWidth);
+        } else {
+            checkPointX = Math.min(worldWidth - playerWidth, playerX + playerWidth);
+        }
+        checkPointY = playerY;
+    }
+
+    if (playerY < -playerHeight) {
+        hasFallen = true;
+    }
+
+    if(hasFallen) {
+        movingLeft = false;
+        movingRight = false;
+
+        lives--;
+        console.log(lives)
+        
+        isRespawning = true;
+
+        playerX = checkPointX;
+        playerY = checkPointY;
         velocityY = 0;
-        isJumping = false;
-        isOnSurface = true;
+
+        player.classList.add("respawning");
+
+        console.log(hasFallen);
+        hasFallen = false;
+
+        setTimeout(() => {
+            console.log("fin respawn");
+            isRespawning = false;
+            player.classList.remove("respawning");
+        }, 1500);
     }
 
-    if(playerRight >= platform1Left && playerX <= platform1Right && playerY <= platform1Top && previousPlayerY >= platform1Top && velocityY < 0) {
-
-        playerY = platform1Top;
-        velocityY = 0; 
-        isJumping = false;
-        isOnSurface = true;
-
-    }
-
-    if (playerRight >= platform2Left && playerX <= platform2Right && playerY <= platform2Top && previousPlayerY >= platform2Top && velocityY < 0) {
-
-        playerY = platform2Top;
-        velocityY = 0;
-        isJumping = false;
-        isOnSurface = true;
-
-    }
-
-    if (playerRight >= platform3Left && playerX <= platform3Right && playerY <= platform3Top && previousPlayerY >= platform3Top && velocityY < 0) {
-
-        playerY = platform3Top;
-        velocityY = 0;
-        isJumping = false;
-        isOnSurface = true;
-
-    }
+    
 
     const playerScreenX = playerX - cameraX;
 
     player.style.left = playerScreenX + "px";
     player.style.bottom = playerY + "px";
+
+    gameContainer.style.backgroundPositionX = -(cameraX * 0.2) + "px";
 
     world.style.left = -cameraX + "px";
 
