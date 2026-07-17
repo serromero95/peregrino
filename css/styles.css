@@ -91,7 +91,7 @@
 
 .lives-container {
     position:absolute;
-    left: 20px;
+    left: 30px;
     top: 30px;
 
     display: flex;
@@ -103,4 +103,49 @@
 .heart, .empty-heart {
     width: 62px;
     height: 62px;
+}
+
+.overlay-game-over {
+    display: none;
+    background-color: rgba(0,0,0,0.6);
+    z-index: 100000;
+    position: absolute;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.img-game-over {
+    width: 600px;
+    height: 300px;
+}
+
+.reset-button {
+    font-family: "Press Start 2P", monospace;
+
+    padding: 24px;
+
+    font-size: 16px;
+    font-weight: bold;
+
+    color: white;
+    background-color: #b22222;
+
+    border: 3px solid white;
+    border-radius: 6px;
+
+    cursor: pointer;
+
+    transition: transform 0.15s;
+}
+
+.reset-button:hover {
+    transform: scale(1.05);
+}
+
+.reset-button:active {
+    transform: scale(0.98);
 }

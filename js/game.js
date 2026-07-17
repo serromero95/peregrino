@@ -106,6 +106,25 @@ let lives = 3;
 
 renderLives();
 
+//Game Over
+
+const overlayGameOver = document.createElement("div");
+const imgGameOver = document.createElement("img");
+const resetButton = document.createElement("button");
+
+overlayGameOver.classList.add("overlay-game-over");
+imgGameOver.classList.add("img-game-over");
+resetButton.classList.add("reset-button");
+
+resetButton.textContent = "Pulsa Enter para reintentar";
+
+imgGameOver.src = "assets/img/ui/game-over.png";
+
+overlayGameOver.append(imgGameOver, resetButton);
+gameContainer.append(overlayGameOver);
+
+let isGameOver = false;
+
 // Player stats
 
 let velocityY = 0;
@@ -152,6 +171,47 @@ function renderLives() {
 
 }
 
+function gameOver() {
+
+        isGameOver = true;
+        movingLeft = false;
+        movingRight = false;
+        overlayGameOver.style.display = "flex";
+
+}
+
+function resetGame() {
+    // Player
+    playerX = groundHeight;
+    playerY = groundHeight;
+    velocityY = 0;
+    facingRight = true;
+    isOnSurface = true;
+
+    movingLeft = false;
+    movingRight = false;
+
+    // Checkpoint
+    checkPointX = 80;
+    checkPointY = groundHeight;
+
+    // States
+    isRespawning = false;
+    hasFallen = false;
+    isGameOver = false;
+
+    // Lives
+    lives = totalLives;
+    renderLives();
+
+    // Camera
+    cameraX = 0;
+
+    // Clean visual states
+    player.classList.remove("respawning");
+    overlayGameOver.style.display = "none";
+}
+
 //Player moves
 
 let facingRight = true;
@@ -159,6 +219,14 @@ let facingRight = true;
 document.addEventListener("keydown", function(event) {
     if(gameKeys.includes(event.code)) {
         event.preventDefault();
+    }
+
+    if (isGameOver) {
+        if (event.code === "Enter") {
+            resetGame();
+        }
+
+        return;
     }
     
     if(isRespawning) {
@@ -191,7 +259,14 @@ document.addEventListener("keyup", function(event) {
     }
 });
 
+resetButton.addEventListener("click", resetGame);
+
 setInterval(function() {
+
+    if (isGameOver) {
+        return;
+    }
+
     isOnSurface = false;
 
     if(movingRight){
@@ -287,6 +362,13 @@ setInterval(function() {
 
         lives--;
         renderLives();
+
+        if(lives === 0) {
+            gameOver();
+            return;
+        }
+
+        
         console.log(lives)
         
         isRespawning = true;
