@@ -89,7 +89,40 @@ gameContainer.appendChild(player);
 let playerX = groundHeight;
 let playerY = groundHeight;
 
-const playerSpriteOffsetY = -3;
+const playerSpriteOffsetY = -4;
+
+const playerIdle = "assets/img/characters/pilgrim.png";
+const playerJump = "assets/img/characters/jumping.png";
+const playerFall = "assets/img/characters/falling.png";
+
+const playerRunFrames = [
+    "assets/img/characters/running-1.png",
+    "assets/img/characters/running-2.png",
+    "assets/img/characters/running-3.png",
+    "assets/img/characters/running-4.png"
+];
+
+const playerSprites = [
+    playerIdle,
+    playerJump,
+    playerFall,
+    ...playerRunFrames
+];
+
+playerSprites.forEach((src) => {
+    const img = new Image();
+    img.src = src;
+});
+
+let currentPlayerSprite = "";
+
+let currentRunFrame = 0;
+let runFrameCounter = 0;
+
+const playerHitboxWidth = 50;
+const playerHitboxHeight = 115;
+const playerHitboxOffsetX = 15;
+const playerHitboxOffsetY = 0;
 
 // Lives
 
@@ -147,6 +180,11 @@ let enemyPatrolRight = 1020;
 const enemyWidth = 150;
 const enemyHeight = 70;
 
+const enemyHitboxWidth = 55;
+const enemyHitboxHeight = 55;
+const enemyHitboxOffsetX = 15;
+const enemyHitboxOffsetY = 0;
+
 //Game Over
 
 const overlayGameOver = document.createElement("div");
@@ -178,7 +216,7 @@ let movingLeft = false;
 let playerSpeed = 5;
 
 const playerWidth = 80;
-const playerHeight = 150;
+const playerHeight = 138;
 
 const gameKeys = ["ArrowLeft", "ArrowRight", "Space", "KeyZ"];
 
@@ -251,6 +289,43 @@ function resetGame() {
     // Clean visual states
     player.classList.remove("respawning");
     overlayGameOver.style.display = "none";
+}
+
+function updatePlayerSprite() {
+    if (!isOnSurface) {
+        if (velocityY > 0) {
+            setPlayerSprite(playerJump);
+        } else {
+            setPlayerSprite(playerFall);
+        }
+
+        return;
+    }
+
+    if (movingRight || movingLeft) {
+        runFrameCounter++;
+
+        if (runFrameCounter % 6 === 0) {
+            currentRunFrame++;
+
+            if (currentRunFrame >= playerRunFrames.length) {
+                currentRunFrame = 0;
+            }
+        }
+
+        setPlayerSprite(playerRunFrames[currentRunFrame]);
+    } else {
+        currentRunFrame = 0;
+        runFrameCounter = 0;
+        setPlayerSprite(playerIdle);
+    }
+}
+
+function setPlayerSprite(src) {
+    if (currentPlayerSprite === src) return;
+
+    player.style.backgroundImage = `url("${src}")`;
+    currentPlayerSprite = src;
 }
 
 //Player moves
@@ -508,12 +583,13 @@ setInterval(function() {
         }, 1500);
     }
 
-    
+    updatePlayerSprite();
 
     const playerScreenX = playerX - cameraX;
 
     player.style.left = playerScreenX + "px";
     player.style.bottom = (playerY + playerSpriteOffsetY) + "px";
+    player.style.transform = facingRight ? "scaleX(1)" : "scaleX(-1)";
 
     gameContainer.style.backgroundPositionX = -(cameraX * 0.2) + "px";
 
@@ -521,5 +597,7 @@ setInterval(function() {
 
     enemy.style.left = enemyX + "px";
     enemy.style.bottom = enemyY + "px";
+
+    
 
 }, 16);
