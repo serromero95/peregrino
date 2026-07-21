@@ -102,11 +102,18 @@ const playerRunFrames = [
     "assets/img/characters/running-4.png"
 ];
 
+const playerAttackFrames = [
+    "./assets/img/characters/attack-1.png",
+    "./assets/img/characters/attack-2.png",
+    "./assets/img/characters/attack-3.png"
+];
+
 const playerSprites = [
     playerIdle,
     playerJump,
     playerFall,
-    ...playerRunFrames
+    ...playerRunFrames,
+    ...playerAttackFrames
 ];
 
 playerSprites.forEach((src) => {
@@ -118,6 +125,9 @@ let currentPlayerSprite = "";
 
 let currentRunFrame = 0;
 let runFrameCounter = 0;
+
+let currentAttackFrame = 0;
+let attackFrameCounter = 0;
 
 const playerHitboxWidth = 50;
 const playerHitboxHeight = 115;
@@ -146,6 +156,10 @@ renderLives();
 let isAttacking = false;
 
 let attackTimeout;
+
+const attackHitboxWidth = 70;
+const attackHitboxHeight = 70;
+const attackHitboxOffsetY = 20;
 
 //SafePoints
 
@@ -179,6 +193,8 @@ let enemyPatrolRight = 1020;
 
 const enemyWidth = 150;
 const enemyHeight = 70;
+
+let enemyIsAlive = true;
 
 const enemyHitboxWidth = 55;
 const enemyHitboxHeight = 55;
@@ -289,9 +305,41 @@ function resetGame() {
     // Clean visual states
     player.classList.remove("respawning");
     overlayGameOver.style.display = "none";
+
+    enemyIsAlive = true;
+    enemy.style.display = "block";
+
+    enemyX = 900;
+    enemyY = groundHeight;
+
+    isPatrollingRight = true;
+    enemy.classList.add("enemy--right");
+    enemy.classList.remove("enemy--left");
 }
 
 function updatePlayerSprite() {
+    if (isAttacking) {
+        player.style.width = "160px";
+        player.style.height = "131px";
+        player.style.backgroundSize = "160px 131px";
+
+        attackFrameCounter++;
+
+        if(attackFrameCounter % 5 === 0 && 
+            currentAttackFrame < playerAttackFrames.length - 1) {
+
+                currentAttackFrame++;
+
+            }
+
+        setPlayerSprite(playerAttackFrames[currentAttackFrame]);
+        return;
+    }
+
+    player.style.width = "80px";
+    player.style.height = "138px";
+    player.style.backgroundSize = "80px 138px";
+
     if (!isOnSurface) {
         if (velocityY > 0) {
             setPlayerSprite(playerJump);
@@ -365,12 +413,16 @@ document.addEventListener("keydown", function(event) {
     if (event.code === "KeyZ" && !isAttacking) {
         isAttacking = true;
         player.classList.add("attacking");
+        currentAttackFrame = 0;
+        attackFrameCounter = 0;
 
         clearTimeout(attackTimeout);
 
         attackTimeout = setTimeout(() => {
             isAttacking = false;
             player.classList.remove("attacking");
+            currentAttackFrame = 0;
+            attackFrameCounter = 0;
         }, 300);
     }
 
@@ -438,18 +490,20 @@ setInterval(function() {
 
     //Enemy
 
-    if(isPatrollingRight && enemyX < enemyPatrolRight) {
-        enemyX += enemySpeed;
-    } else if (!isPatrollingRight && enemyX > enemyPatrolLeft) {
-        enemyX -= enemySpeed;
-    } else if (isPatrollingRight) {
-        isPatrollingRight = false;
-        enemy.classList.add("enemy--left");
-        enemy.classList.remove("enemy--right");
-    } else {
-        isPatrollingRight = true;
-        enemy.classList.add("enemy--right");
-        enemy.classList.remove("enemy--left");
+    if(enemyIsAlive){
+        if(isPatrollingRight && enemyX < enemyPatrolRight) {
+            enemyX += enemySpeed;
+        } else if (!isPatrollingRight && enemyX > enemyPatrolLeft) {
+            enemyX -= enemySpeed;
+        } else if (isPatrollingRight) {
+            isPatrollingRight = false;
+            enemy.classList.add("enemy--left");
+            enemy.classList.remove("enemy--right");
+        } else {
+            isPatrollingRight = true;
+            enemy.classList.add("enemy--right");
+            enemy.classList.remove("enemy--left");
+        }
     }
 
     const enemyRight = enemyX + enemyWidth;
@@ -466,39 +520,68 @@ setInterval(function() {
 
     //Enemy Collision
 
-    if (
-        playerRight >= enemyX &&
-        playerX <= enemyRight &&
-        playerTop >= enemyY &&
-        playerY <= enemyTop &&
-        !isRespawning
+    const playerHitboxLeft = playerX + playerHitboxOffsetX;
+    const playerHitboxRight = playerHitboxLeft + playerHitboxWidth;
+    const playerHitboxBottom = playerY + playerHitboxOffsetY;
+    const playerHitboxTop = playerHitboxBottom + playerHitboxHeight;
+
+    const enemyHitboxLeft = enemyX + enemyHitboxOffsetX;
+    const enemyHitboxRight = enemyHitboxLeft + enemyHitboxWidth;
+    const enemyHitboxBottom = enemyY + enemyHitboxOffsetY;
+    const enemyHitboxTop = enemyHitboxBottom + enemyHitboxHeight;
+
+    const attackHitboxLeft = facingRight
+    ? playerX + playerWidth
+    : playerX - attackHitboxWidth;
+
+    const attackHitboxRight = attackHitboxLeft + attackHitboxWidth;
+
+    const attackHitboxBottom = playerY + attackHitboxOffsetY;
+    const attackHitboxTop = attackHitboxBottom + attackHitboxHeight;
+
+    const attackHitsEnemy =
+    attackHitboxRight >= enemyHitboxLeft &&
+    attackHitboxLeft <= enemyHitboxRight &&
+    attackHitboxTop >= enemyHitboxBottom &&
+    attackHitboxBottom <= enemyHitboxTop;
+
+    const playerTouchesEnemy =
+        playerHitboxRight >= enemyHitboxLeft &&
+        playerHitboxLeft <= enemyHitboxRight &&
+        playerHitboxTop >= enemyHitboxBottom &&
+        playerHitboxBottom <= enemyHitboxTop;
+
+    if (enemyIsAlive && isAttacking && attackHitsEnemy) {
+        enemyIsAlive = false;
+        enemy.style.display = "none";
+    } else if (
+        enemyIsAlive &&
+        playerTouchesEnemy &&
+        !isRespawning &&
+        !isAttacking
     ) {
-        if(isAttacking) {
-            enemy.remove();
-        } else if (!isRespawning) {
-            lives--;
-            renderLives();
+        lives--;
+        renderLives();
 
-            if(lives === 0) {
-                gameOver();
-                return;
-            }
-
-            isRespawning = true;
-            movingLeft = false;
-            movingRight = false;
-
-            playerX = enemySafePointX;
-            playerY = enemySafePointY;
-            velocityY = 0;
-
-            player.classList.add("respawning");
-
-            setTimeout(() => {
-                isRespawning = false;
-                player.classList.remove("respawning");
-            }, 1500);
+        if (lives === 0) {
+            gameOver();
+            return;
         }
+
+        isRespawning = true;
+        movingLeft = false;
+        movingRight = false;
+
+        playerX = enemySafePointX;
+        playerY = enemySafePointY;
+        velocityY = 0;
+
+        player.classList.add("respawning");
+
+        setTimeout(() => {
+            isRespawning = false;
+            player.classList.remove("respawning");
+        }, 1500);
     }
 
     //Grounds collision
