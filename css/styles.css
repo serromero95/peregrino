@@ -26,7 +26,7 @@
 
     position: absolute;
     left: 80px;
-    bottom: 80px;
+    bottom:50px;
 
     background-image: url("../assets/img/characters/pilgrim.png");
     background-size: contain;
@@ -121,6 +121,20 @@
 .img-game-over {
     width: 600px;
     height: 300px;
+
+    animation: gameOverEnter 0.8s ease-out;
+}
+
+@keyframes gameOverEnter {
+    from {
+        transform: translateY(300px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
 }
 
 .reset-button {
@@ -140,6 +154,20 @@
     cursor: pointer;
 
     transition: transform 0.15s;
+
+    animation: resetButtonEnter 0.5s ease-out 0.5s both;
+}
+
+@keyframes resetButtonEnter {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .reset-button:hover {
@@ -148,4 +176,22 @@
 
 .reset-button:active {
     transform: scale(0.98);
+}
+
+.enemy {
+    position: absolute;
+    left: 160px;
+    bottom: 80px;
+    width: 150px;
+    height:70px;
+    background-size: contain;
+    background-repeat: no-repeat;    
+}
+
+.enemy--right {
+    background-image: url("../assets/img/enemies/right-wolf.png");
+}
+
+.enemy--left {
+    background-image: url("../assets/img/enemies/left-wolf.png");
 }

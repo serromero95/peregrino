@@ -89,6 +89,8 @@ gameContainer.appendChild(player);
 let playerX = groundHeight;
 let playerY = groundHeight;
 
+const playerSpriteOffsetY = -3;
+
 // Lives
 
 const livesContainer = document.createElement("div");
@@ -105,6 +107,45 @@ let totalLives = 3;
 let lives = 3;
 
 renderLives();
+
+//player Attack
+
+let isAttacking = false;
+
+let attackTimeout;
+
+//SafePoints
+
+let enemySafePointX = 700;
+let enemySafePointY = groundHeight;
+
+const checkpoints = [
+    { x: 80, y: groundHeight },
+    { x: 1400, y: groundHeight },
+    { x: 2000, y: groundHeight },
+    { x: 2700, y: groundHeight }
+];
+
+//Enemies
+
+const enemy = document.createElement("div");
+
+enemy.classList.add("enemy", "enemy--right");
+
+world.append(enemy);
+
+let enemyX = 900;
+let enemyY = groundHeight;
+
+let enemySpeed = 2;
+
+let isPatrollingRight = true;
+
+let enemyPatrolLeft = 760;
+let enemyPatrolRight = 1020;
+
+const enemyWidth = 150;
+const enemyHeight = 70;
 
 //Game Over
 
@@ -139,7 +180,7 @@ let playerSpeed = 5;
 const playerWidth = 80;
 const playerHeight = 150;
 
-const gameKeys = ["ArrowLeft", "ArrowRight", "Space"];
+const gameKeys = ["ArrowLeft", "ArrowRight", "Space", "KeyZ"];
 
 //Sreen & Camera
 
@@ -246,6 +287,18 @@ document.addEventListener("keydown", function(event) {
         isOnSurface = false;
     }
 
+    if (event.code === "KeyZ" && !isAttacking) {
+        isAttacking = true;
+        player.classList.add("attacking");
+
+        clearTimeout(attackTimeout);
+
+        attackTimeout = setTimeout(() => {
+            isAttacking = false;
+            player.classList.remove("attacking");
+        }, 300);
+    }
+
 });
 
 document.addEventListener("keyup", function(event) {
@@ -302,10 +355,76 @@ setInterval(function() {
     }
 
     const playerRight = playerX + playerWidth;
+    const playerTop = playerY + playerHeight;
 
     const previousPlayerY = playerY;
     playerY = playerY + velocityY;
     velocityY = velocityY - gravity;
+
+    //Enemy
+
+    if(isPatrollingRight && enemyX < enemyPatrolRight) {
+        enemyX += enemySpeed;
+    } else if (!isPatrollingRight && enemyX > enemyPatrolLeft) {
+        enemyX -= enemySpeed;
+    } else if (isPatrollingRight) {
+        isPatrollingRight = false;
+        enemy.classList.add("enemy--left");
+        enemy.classList.remove("enemy--right");
+    } else {
+        isPatrollingRight = true;
+        enemy.classList.add("enemy--right");
+        enemy.classList.remove("enemy--left");
+    }
+
+    const enemyRight = enemyX + enemyWidth;
+    const enemyTop = enemyY + enemyHeight;
+
+    //checkPoints
+
+    checkpoints.forEach(checkpoint => {
+        if (playerX >= checkpoint.x) {
+            checkPointX = checkpoint.x;
+            checkPointY = checkpoint.y;
+        }
+    });
+
+    //Enemy Collision
+
+    if (
+        playerRight >= enemyX &&
+        playerX <= enemyRight &&
+        playerTop >= enemyY &&
+        playerY <= enemyTop &&
+        !isRespawning
+    ) {
+        if(isAttacking) {
+            enemy.remove();
+        } else if (!isRespawning) {
+            lives--;
+            renderLives();
+
+            if(lives === 0) {
+                gameOver();
+                return;
+            }
+
+            isRespawning = true;
+            movingLeft = false;
+            movingRight = false;
+
+            playerX = enemySafePointX;
+            playerY = enemySafePointY;
+            velocityY = 0;
+
+            player.classList.add("respawning");
+
+            setTimeout(() => {
+                isRespawning = false;
+                player.classList.remove("respawning");
+            }, 1500);
+        }
+    }
 
     //Grounds collision
 
@@ -394,10 +513,13 @@ setInterval(function() {
     const playerScreenX = playerX - cameraX;
 
     player.style.left = playerScreenX + "px";
-    player.style.bottom = playerY + "px";
+    player.style.bottom = (playerY + playerSpriteOffsetY) + "px";
 
     gameContainer.style.backgroundPositionX = -(cameraX * 0.2) + "px";
 
     world.style.left = -cameraX + "px";
+
+    enemy.style.left = enemyX + "px";
+    enemy.style.bottom = enemyY + "px";
 
 }, 16);
