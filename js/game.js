@@ -80,6 +80,35 @@ platforms.forEach(platform => {
     world.append(block);
 });
 
+//Hostel
+
+const hostel = document.createElement("div");
+
+hostel.classList.add("hostel");
+
+world.append(hostel);
+
+const hostelWidth = 320;
+const hostelHeight = 220;
+
+const hostelY = groundHeight;
+const hostelX = worldWidth - hostelWidth;
+
+hostel.style.left = hostelX + "px";
+hostel.style.bottom = hostelY + "px";
+
+//Hostel Hitbox
+
+const hostelHitboxWidth = 60;
+const hostelHitboxHeight = 120;
+const hostelHitboxOffsetX = 130;
+const hostelHitboxOffsetY = 0;
+
+const hostelHitboxLeft = hostelX + hostelHitboxOffsetX;
+const hostelHitboxRight = hostelHitboxLeft + hostelHitboxWidth;
+const hostelHitboxBottom = hostelY + hostelHitboxOffsetY;
+const hostelHitboxTop = hostelHitboxBottom + hostelHitboxHeight;
+
 //Player
 
 const player = document.createElement("div");
@@ -151,7 +180,7 @@ let lives = 3;
 
 renderLives();
 
-//player Attack
+//Player Attack
 
 let isAttacking = false;
 
@@ -236,7 +265,7 @@ const playerHeight = 138;
 
 const gameKeys = ["ArrowLeft", "ArrowRight", "Space", "KeyZ"];
 
-//Sreen & Camera
+//Screen & Camera
 
 let cameraX = 0;
 
@@ -584,6 +613,14 @@ setInterval(function() {
         }, 1500);
     }
 
+    //HostelHitbox Collision
+
+    const playerTouchesHostel = 
+        playerHitboxRight >= hostelHitboxLeft &&
+        playerHitboxLeft <= hostelHitboxRight &&
+        playerHitboxTop >= hostelHitboxBottom &&
+        playerHitboxBottom <= hostelHitboxTop;
+
     //Grounds collision
 
     grounds.forEach(ground => {
@@ -670,7 +707,14 @@ setInterval(function() {
 
     const playerScreenX = playerX - cameraX;
 
-    player.style.left = playerScreenX + "px";
+    const attackVisualOffset =
+        isAttacking && !facingRight
+            ? 160 - playerWidth
+            : 0;
+
+    player.style.left =
+        (playerScreenX - attackVisualOffset) + "px";
+
     player.style.bottom = (playerY + playerSpriteOffsetY) + "px";
     player.style.transform = facingRight ? "scaleX(1)" : "scaleX(-1)";
 
